@@ -29,8 +29,8 @@ class RegressionTrainingSet(object):
             .reshape(1, self.feature_number)  # numpy row vector
         self.sigma = np.std(self.features, axis=0, ddof=1)\
             .reshape(1, self.feature_number)  # numpy row vector
-        self.init_theta = np.zeros((self.feature_number + 1, 1))
-        self.final_theta = self.init_theta
+        self.init_theta = np.zeros((1, self.feature_number + 1))  # numpy row vector
+        self.final_theta = self.init_theta  # numpy row vector
         self.trained = False
         self.cost_history = []
 
@@ -63,7 +63,7 @@ class RegressionTrainingSet(object):
             .reshape(1, model.feature_number)  # numpy row vector
         model.sigma = np.std(model.features, axis=0, ddof=1) \
             .reshape(1, model.feature_number)  # numpy row vector
-        model.init_theta = np.zeros((model.feature_number + 1, 1))
+        model.init_theta = np.zeros((1, model.feature_number + 1))  # numpy row vector
         model.final_theta = model.init_theta
         model.trained = False
         model.cost_history = []

@@ -1,7 +1,6 @@
 """
 
 """
-import scipy.io as sio
 import numpy as np
 import machine_learning.util.linear_regression as ln
 from machine_learning.core.base_model import RegressionTrainingSet
@@ -24,7 +23,7 @@ class LinearRegressionTraining(RegressionTrainingSet):
         if self.normalized:
             new_feature = (new_feature - self.mean) / self.sigma
         feature = np.hstack((np.ones((new_feature.shape[0], 1)), new_feature))
-        return feature.dot(self.final_theta)
+        return feature.dot(self.final_theta.T)
 
     def train_with_gd(self, alpha=0.01, iterations=10000, plot_cost=False,
                       normalization=True, regularization=False, lbd=0):
@@ -43,7 +42,7 @@ class LinearRegressionTraining(RegressionTrainingSet):
                     iterations, regularization=regularization, lbd=lbd)
             self.trained = True
         if plot_cost:
-            self.plot_cost(self.cost_history)
+            self.plot_cost()
 
     def train_with_op(self, normalization=True, regularization=False, lbd=0):
         if self.trained:

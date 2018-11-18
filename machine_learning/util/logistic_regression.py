@@ -30,27 +30,32 @@ def cost_func(x, y, theta, lbd=0):
 
     :param x: numpy matrix of features m * n+1
     :param y: numpy column vector of result m * 1
-    :param theta: numpy column vector of params n+1 * 1
+    :param theta: numpy row vector of params 1 * n+1
     :param lbd: lambda value for regularization
-    :return: cost for current theta n+1 * 1
+    :return: cost for current theta
     """
-    # theta is (n + 1, 1)
+    # theta is (1, n + 1)
     # x is (m, n + 1)
     # y is (m, 1)
     m = x.shape[0]
-    # print x.shape
-    # print theta.shape
-    # print x.dot(theta).shape
-    h_x = sigmoid(x.dot(theta))
+    h_x = sigmoid(x.dot(theta.T))
     j = np.sum(((-y).T.dot(np.log(h_x)) - (1 - y).T.dot(np.log(1 - h_x)))) / m
     if lbd != 0:
-        j_r = np.sum(theta[1:, 0:1]) * lbd / 2 / m
+        j_r = np.sum(theta[0:1, 1:]) * lbd / 2 / m
         j = j + j_r
     return j
 
 
 def cost_flatten(theta, x, y, lbd=0):
-    theta = theta.reshape((theta.size, 1))
+    """
+
+    :param theta: n+1 length list passed in by optimization func
+    :param x:
+    :param y:
+    :param lbd:
+    :return:
+    """
+    theta = theta.reshape((1, theta.size))  # convert (n+1,) to (1,n+1)
     return cost_func(x, y, theta, lbd)
 
 
@@ -59,22 +64,30 @@ def grad(x, y, theta, lbd=0):
 
     :param x: numpy matrix of features m * n+1
     :param y: numpy column vector of result m * 1
-    :param theta: numpy column vector of params n+1 * 1
+    :param theta: numpy row vector of params 1 * n+1
     :param lbd: lambda value for regularization
-    :return: gradient of current theta n+1 * 1
+    :return: gradient of current theta 1 * n+1
     """
     m = x.shape[0]
-    h_x = sigmoid(x.dot(theta))
-    delta = ((h_x - y).T.dot(x)).T / m
+    h_x = sigmoid(x.dot(theta.T))
+    delta = ((h_x - y).T.dot(x)) / m  # 1 * n+1
     if lbd != 0:
-        delta_r = np.vstack((0, theta[1:, 0:1] * lbd / m))
+        delta_r = np.hstack((0, theta[0:1, 1:] * lbd / m))
         delta = delta + delta_r
     return delta
 
 
 def grad_flatten(theta, x, y, lbd=0):
-    theta = theta.reshape((theta.size, 1))
-    return grad(x, y, theta, lbd)
+    """
+
+    :param theta: n+1 length list passed in by optimization func
+    :param x:
+    :param y:
+    :param lbd:
+    :return:
+    """
+    theta = theta.reshape((1, theta.size))  # convert (n+1,) to (1,n+1)
+    return grad(x, y, theta, lbd).T  # op func requires a column vector
 
 
 def gradient_descent(x, y, theta, alpha=0.01, iterations=10000,
@@ -83,13 +96,13 @@ def gradient_descent(x, y, theta, alpha=0.01, iterations=10000,
 
     :param x: numpy matrix of features m * n+1
     :param y: numpy column vector of result m * 1
-    :param theta: numpy column vector of params n+1 * 1
+    :param theta: numpy row vector of params 1 * n+1
     :param alpha: descent factor
     :param iterations: iteration times
     :param display_cost: display the current cost on each iteration
     :param regularization: choose to regularize to avoid over-fitting
     :param lbd: lambda value for regularization
-    :return: trained theta n+1 * 1
+    :return: trained theta 1 * n+1
     """
 
     cost_history = []
@@ -120,13 +133,22 @@ def normal_equation(x, y):
 
     :param x: numpy matrix of features m * n+1
     :param y: numpy column vector of result m * 1
-    :return: trained theta n+1 * 1
+    :return: trained theta 1 * n+1
     """
     theta = np.linalg.inv(x.T.dot(x)).dot(x.T).dot(y)
-    return theta
+    return theta.T
 
 
 def optimize_function(x, y, theta, regularization=False, lbd=0):
+    """
+
+    :param x: numpy matrix of features m * n+1
+    :param y: numpy column vector of result m * 1
+    :param theta: numpy row vector of params 1 * n+1
+    :param regularization:
+    :param lbd:
+    :return:
+    """
     n = x.shape[1]
     theta = theta.reshape((n,))
     if regularization:
@@ -136,4 +158,4 @@ def optimize_function(x, y, theta, regularization=False, lbd=0):
         result = op.minimize(fun=cost_flatten, x0=theta, args=(x, y),
                              method='TNC', jac=grad_flatten)
 
-    return result.x
+    return result.x.reshape((1, n))

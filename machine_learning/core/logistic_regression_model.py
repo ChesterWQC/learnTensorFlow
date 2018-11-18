@@ -1,18 +1,17 @@
 """
 
 """
-import scipy.io as sio
 import numpy as np
 import machine_learning.util.logistic_regression as lor
 from machine_learning.core.base_model import RegressionTrainingSet
 
 
-class LogisticRegressionTraining(RegressionTrainingSet):
+class LogisticRegressionTrainingBinary(RegressionTrainingSet):
 
     def __init__(self, data=None):
-        super(LogisticRegressionTraining, self).__init__(data)
+        super(LogisticRegressionTrainingBinary, self).__init__(data)
 
-    def predict_binary_classification(self, new_feature):
+    def predict(self, new_feature):
         """
 
         :param new_feature: m * n matrix
@@ -24,7 +23,7 @@ class LogisticRegressionTraining(RegressionTrainingSet):
         if self.normalized:
             new_feature = (new_feature - self.mean) / self.sigma
         feature = np.hstack((np.ones((new_feature.shape[0], 1)), new_feature))
-        result = feature.dot(self.final_theta)
+        result = feature.dot(self.final_theta.T)
         for i in range(new_feature.shape[0]):
             if result[i, 0] >= 0.5:
                 result[i, 0] = 1
