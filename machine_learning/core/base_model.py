@@ -66,6 +66,10 @@ class RegressionTrainingSet(object):
         y = contents['y']
         return cls(x, y)
 
+    def save_to_mat(self, path):
+        map_to_args = {'theta': self.final_theta}
+        sio.savemat(path, map_to_args)
+
     def normalize(self):
         """
 
