@@ -3,13 +3,14 @@
 """
 import numpy as np
 import machine_learning.util.linear_regression as ln
-from machine_learning.core.base_model import RegressionTrainingSet
+from machine_learning.core.base_model import RegressionTrainingSet, TrainingType
 
 
 class LinearRegressionTraining(RegressionTrainingSet):
 
-    def __init__(self, data=None):
-        super(LinearRegressionTraining, self).__init__(data)
+    def __init__(self, x, y):
+        super(LinearRegressionTraining, self).__init__(x, y)
+        self._type = TrainingType.LINEAR_REGRESSION
 
     def predict(self, new_feature):
         """
@@ -26,7 +27,7 @@ class LinearRegressionTraining(RegressionTrainingSet):
         return feature.dot(self.final_theta.T)
 
     def train_with_gd(self, alpha=0.01, iterations=10000, plot_cost=False,
-                      normalization=True, regularization=False, lbd=0):
+                      normalization=False, regularization=False, lbd=0):
         if self.trained:
             print 'This model has already been trained!'
         else:
@@ -44,7 +45,7 @@ class LinearRegressionTraining(RegressionTrainingSet):
         if plot_cost:
             self.plot_cost()
 
-    def train_with_op(self, normalization=True, regularization=False, lbd=0):
+    def train_with_op(self, normalization=False, regularization=False, lbd=0):
         if self.trained:
             print 'This model has already been trained'
         else:

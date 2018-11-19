@@ -1,4 +1,5 @@
 .idea/
 data/
 draft_area.py
+*.pyc
 

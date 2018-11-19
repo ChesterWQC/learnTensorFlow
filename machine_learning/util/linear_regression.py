@@ -33,9 +33,9 @@ def cost_func(x, y, theta, lbd=0):
     # x is (m, n + 1)
     # y is (m, 1)
     m = x.shape[0]
-    j = np.sum(np.square((x.dot(theta.T) - y))) / 2 / m
+    j = np.sum(np.square((x.dot(theta.T) - y))) / 2.0 / m
     if lbd != 0:
-        j_r = np.sum(theta[0:1, 1:]) * lbd / 2 / m
+        j_r = np.sum(theta[0:1, 1:]) * lbd / 2.0 / m
         j = j + j_r
     return j
 
@@ -63,9 +63,9 @@ def grad(x, y, theta, lbd=0):
     :return: gradient of current theta 1 * n+1
     """
     m = x.shape[0]
-    delta = ((x.dot(theta.T) - y).T.dot(x)) / m
+    delta = ((x.dot(theta.T) - y).T.dot(x)) * 1.0 / m
     if lbd != 0:
-        delta_r = np.hstack((0, theta[0:1, 1:] * lbd / m))
+        delta_r = np.hstack((np.array[[0]], theta[0:1, 1:] * 1.0 * lbd / m))
         delta = delta + delta_r
     return delta
 

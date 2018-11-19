@@ -39,9 +39,10 @@ def cost_func(x, y, theta, lbd=0):
     # y is (m, 1)
     m = x.shape[0]
     h_x = sigmoid(x.dot(theta.T))
-    j = np.sum(((-y).T.dot(np.log(h_x)) - (1 - y).T.dot(np.log(1 - h_x)))) / m
+    j = np.sum(((0 - y).T.dot(np.log(h_x)) - (1 - y).T.dot(np.log(1 - h_x))))\
+        * 1.0 / m
     if lbd != 0:
-        j_r = np.sum(theta[0:1, 1:]) * lbd / 2 / m
+        j_r = np.sum(np.square(theta[0:1, 1:])) * lbd / 2.0 / m
         j = j + j_r
     return j
 
@@ -70,9 +71,9 @@ def grad(x, y, theta, lbd=0):
     """
     m = x.shape[0]
     h_x = sigmoid(x.dot(theta.T))
-    delta = ((h_x - y).T.dot(x)) / m  # 1 * n+1
+    delta = ((h_x - y).T.dot(x)) * 1.0 / m  # 1 * n+1
     if lbd != 0:
-        delta_r = np.hstack((0, theta[0:1, 1:] * lbd / m))
+        delta_r = np.hstack((np.zeros((1, 1)), theta[0:1, 1:] * lbd * 1.0 / m))
         delta = delta + delta_r
     return delta
 

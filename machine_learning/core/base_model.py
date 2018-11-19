@@ -7,24 +7,34 @@ import matplotlib.pyplot as plt
 import scipy.io as sio
 
 
+class TrainingType:
+
+    LINEAR_REGRESSION = 'LINEAR_REGRESSION'
+    LOGISTIC_REGRESSION_BINARY = 'LOGISTIC_REGRESSION_BINARY'
+    LOGISTIC_REGRESSION_MULTI = 'LOGISTIC_REGRESSION_MULTI'
+
+    def __init__(self):
+        pass
+
+
 class RegressionTrainingSet(object):
     """
     Training set including features and the result
     """
-    def __init__(self, data=None):
+    def __init__(self, x, y):
         """
 
-        :param data: 2-d list
+        :param x: m * n matrix
+        :param y: m * 1 matrix
         """
-        if data is None:
-            return
-        self._data_set = np.array(data)
-        self.sample_size = len(data)
-        self.feature_number = len(data[0]) - 1
-        self.features = self._data_set[:, :self.feature_number]  # numpy matrix [[1,2,3],[4,5,6]]
+
+        self._data_set = np.hstack((x, y))
+        self.sample_size = x.shape[0]
+        self.feature_number = x.shape[1]
+        self.features = x  # numpy matrix [[1,2,3],[4,5,6]]
         self.normalized_features = self.features
         self.normalized = False
-        self.results = self._data_set[:, self.feature_number:]  # numpy column vector
+        self.results = y  # numpy column vector
         self.mean = np.mean(self.features, axis=0)\
             .reshape(1, self.feature_number)  # numpy row vector
         self.sigma = np.std(self.features, axis=0, ddof=1)\
@@ -44,30 +54,17 @@ class RegressionTrainingSet(object):
                 line = line.split(",")
                 arr = [float(i) for i in line]
                 data.append(arr)
-        return cls(data)
+        data_set = np.array(data)
+        x = data_set[:, :data_set.shape[1] - 1]
+        y = data_set[:, data_set.shape[1] - 1:]
+        return cls(x, y)
 
     @classmethod
     def read_from_mat(cls, path):
         contents = sio.loadmat(path)
-        model = cls()
         x = contents['X']
         y = contents['y']
-        model._data_set = np.hstack((x, y))
-        model.sample_size = x.shape[0]
-        model.feature_number = x.shape[1]
-        model.features = x  # numpy matrix [[1,2,3],[4,5,6]]
-        model.normalized_features = model.features
-        model.normalized = False
-        model.results = y  # numpy column vector
-        model.mean = np.mean(model.features, axis=0) \
-            .reshape(1, model.feature_number)  # numpy row vector
-        model.sigma = np.std(model.features, axis=0, ddof=1) \
-            .reshape(1, model.feature_number)  # numpy row vector
-        model.init_theta = np.zeros((1, model.feature_number + 1))  # numpy row vector
-        model.final_theta = model.init_theta
-        model.trained = False
-        model.cost_history = []
-        return model
+        return cls(x, y)
 
     def normalize(self):
         """
@@ -77,7 +74,10 @@ class RegressionTrainingSet(object):
         if self.normalized:
             return self.normalized_features
         else:
-            self.normalized_features = (self.features - self.mean) / self.sigma
+            self.normalized_features =\
+                np.divide(self.features - self.mean, self.mean,
+                          out=np.zeros_like(self.features - self.mean),
+                          where=self.mean != 0)
             self.normalized = True
             return self.normalized_features
 
@@ -88,7 +88,7 @@ class RegressionTrainingSet(object):
                       regularization=False, lbd=0):
         pass
 
-    def train_with_op(self, normalization=True, regularization=False, lbd=0):
+    def train_with_op(self, normalization=False, regularization=False, lbd=0):
         pass
 
     def clear_trained_result(self):
