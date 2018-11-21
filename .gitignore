@@ -1,6 +1,7 @@
 .idea/
 data/
 draft_area.py
+draft_area_for_tf.py
 *.pyc
 .DS_Store
 

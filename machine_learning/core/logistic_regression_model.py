@@ -148,3 +148,31 @@ class LogisticRegressionTrainingMulti(RegressionTrainingSet):
                 label_index = label_index + 1
             self.trained = True
 
+    def train_with_op_with_gray_scale_processing(self, normalization=False,
+                                                 regularization=False, lbd=0):
+        if self.trained:
+            print 'This model has already been trained'
+        else:
+            if normalization:
+                features = self.normalize()
+            else:
+                max_val = np.max(self.features, axis=1).\
+                              reshape((self.features.shape[0], 1)) * 1.0
+
+                features = np.divide(np.abs(self.features), max_val,
+                                     out=np.zeros_like(self.features),
+                                     where=max_val != 0)
+            processed_features = np.hstack((np.ones((self.sample_size, 1)),
+                                            features))
+            label_index = 0
+            for label in self.labels:
+                init_theta_single = self.init_theta[
+                                    label_index:label_index + 1, :]  # 1 * n + 1
+                final_theta_single = lor.optimize_function(
+                    processed_features, (self.results == label),
+                    init_theta_single, regularization=regularization, lbd=lbd)
+                self.final_theta[label_index:label_index + 1, :] \
+                    = final_theta_single
+                label_index = label_index + 1
+            self.trained = True
+
