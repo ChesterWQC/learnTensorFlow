@@ -106,6 +106,16 @@ class RegressionTrainingSet(object):
         plt.ylabel("J")
         plt.show()
 
+    def plot_cost_multi(self):
+        legend = []
+        for index, label in enumerate(self.labels):
+            legend.append('y = {}'.format(label))
+            plt.plot(self.cost_history[index])
+        plt.legend(legend, loc='upper right')
+        plt.xlabel("Iterations")
+        plt.ylabel("J")
+        plt.show()
+
 
 
 

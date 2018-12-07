@@ -124,7 +124,7 @@ class LogisticRegressionTrainingMulti(RegressionTrainingSet):
                 label_index = label_index + 1
             self.trained = True
         if plot_cost:
-            self.plot_cost()
+            self.plot_cost_multi()
 
     def train_with_op(self, normalization=False, regularization=False, lbd=0):
         if self.trained:
